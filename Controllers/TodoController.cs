@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ToDoList.Api.Domain;
+using ToDoList.Api.DTOs;
 
 namespace ToDoList.Api.Controllers
 {
@@ -33,5 +34,21 @@ namespace ToDoList.Api.Controllers
             };
             return Ok(todo);
         }
+        
+        [HttpPost]
+        public IActionResult CreateTodo(CreateTodoDto dto) 
+        {
+            var todo = new Todo
+            {
+                Id = 3,
+                Title = dto.Title,
+                Description = dto.Description,
+                IsCompleted = false,
+                CreatedAt = DateTime.UtcNow,
+                Deadline = dto.Deadline
+            };
+            return Ok(todo);
+        }
+        
     }
 }

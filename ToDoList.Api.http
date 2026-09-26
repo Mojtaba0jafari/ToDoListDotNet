@@ -1,6 +1,14 @@
 @ToDoList.Api_HostAddress = http://localhost:5112
 
-GET {{ToDoList.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+GET {{ToDoList.Api_HostAddress}}/api/Todo
 
 ###
+
+POST {{ToDoList.Api_HostAddress}}/api/Todo
+Content-Type: application/json
+
+{
+  "title": "Learn EF Core",
+  "description": "Connect the Todo API to a database",
+  "deadline": "2026-10-01T00:00:00"
+}
