@@ -1,4 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using ToDoList.Api.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<TodoDbContext>(options =>
+    options.UseNpgsql(
+        "Host=localhost;Port=5432;Database=todo_db;Username=postgres;Password=!!!"));
 
 builder.Services.AddControllers();
 // Add services to the container.
