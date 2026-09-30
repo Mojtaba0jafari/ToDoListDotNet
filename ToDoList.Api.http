@@ -8,7 +8,7 @@ POST {{ToDoList.Api_HostAddress}}/api/Todo
 Content-Type: application/json
 
 {
-  "title": "Learn EF Core",
-  "description": "Connect the Todo API to a database",
-  "deadline": "2026-10-01T00:00:00"
+  "title": "Learn Dependency Injection",
+  "description": "Understand DI in ASP.NET Core",
+  "deadline": "2026-10-02T00:00:00Z"
 }
