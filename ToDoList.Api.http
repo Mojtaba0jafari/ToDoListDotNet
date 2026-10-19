@@ -12,3 +12,19 @@ Content-Type: application/json
   "description": "Understand DI in ASP.NET Core",
   "deadline": "2026-10-02T00:00:00Z"
 }
+
+###
+
+PUT {{ToDoList.Api_HostAddress}}/api/Todo/10
+Content-Type: application/json
+
+{
+  "title": "Learn ASP.NET Core",
+  "description": "Practice CRUD operations",
+  "isCompleted": true,
+  "deadline": "2026-10-25T00:00:00Z"
+}
+
+###
+
+DELETE {{ToDoList.Api_HostAddress}}/api/Todo/3
