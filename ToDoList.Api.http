@@ -8,14 +8,14 @@ POST {{ToDoList.Api_HostAddress}}/api/Todo
 Content-Type: application/json
 
 {
-  "title": "Learn HTTP status codes",
-  "description": "Practice CreatedAtAction",
-  "deadline": "2026-11-01T00:00:00Z"
+  "title": "Learn ASP.NET Core",
+  "description": "Practice CRUD operations",
+  "deadline": "2026-10-25T00:00:00Z"
 }
 
 ###
 
-PUT {{ToDoList.Api_HostAddress}}/api/Todo/10
+PUT {{ToDoList.Api_HostAddress}}/api/Todo/8
 Content-Type: application/json
 
 {
@@ -27,7 +27,7 @@ Content-Type: application/json
 
 ###
 
-DELETE {{ToDoList.Api_HostAddress}}/api/Todo/3
+DELETE {{ToDoList.Api_HostAddress}}/api/Todo/1
 
 
 ###
@@ -54,5 +54,5 @@ Content-Type: application/json
 
 ###
 
-GET {{ToDoList.Api_HostAddress}}/api/Todo/10
+GET {{ToDoList.Api_HostAddress}}/api/Todo/1
 

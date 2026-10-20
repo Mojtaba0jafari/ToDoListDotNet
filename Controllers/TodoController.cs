@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ToDoList.Api.Domain;
+using ToDoList.Api.Services;
 using ToDoList.Api.DTOs;
-using ToDoList.Api.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace ToDoList.Api.Controllers
 {
@@ -10,17 +8,17 @@ namespace ToDoList.Api.Controllers
     [Route("api/[controller]")]
     public class TodoController : ControllerBase
     {
-        private readonly TodoDbContext _context;
+        private readonly TodoService _todoService;
 
-        public TodoController(TodoDbContext context)
+        public TodoController(TodoService todoService)
         {
-            _context = context;
+            _todoService = todoService;
         }
         
         [HttpGet]
         public async Task<IActionResult> GetTodos()
         {
-            var todo = await _context.Todos.ToListAsync();
+            var todo = await _todoService.GetAllAsync();
             
             return Ok(todo);
         }
@@ -28,12 +26,9 @@ namespace ToDoList.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTodoById(int id)
         {
-            var todo = await _context.Todos.FindAsync(id);
-
+            var todo = await _todoService.GetByIdAsync(id);
             if (todo == null)
-            {
                 return NotFound();
-            }
 
             return Ok(todo);
         }
@@ -41,36 +36,20 @@ namespace ToDoList.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTodo(CreateTodoDto dto) 
         {
-            var todo = new Todo
-            {
-                Title = dto.Title,
-                Description = dto.Description,
-                IsCompleted = false,
-                CreatedAt = DateTime.UtcNow,
-                Deadline = dto.Deadline
-            };
-            _context.Todos.Add(todo);
-            await _context.SaveChangesAsync();
+            var todo = await _todoService.CreateAsync(dto);
 
-            return CreatedAtAction(nameof(GetTodoById), new {id = todo.Id}, todo);
+            return CreatedAtAction(
+                nameof(GetTodoById), 
+                new {id = todo.Id}, 
+                todo);
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTodo(int id, UpdateTodoDto dto)
         {
-            var todo = await _context.Todos.FindAsync(id);
-
+            var todo = await _todoService.UpdatedAsync(id, dto);
             if (todo == null)
-            {
                 return NotFound();
-            }
-
-            todo.Title = dto.Title;
-            todo.Description = dto.Description;
-            todo.IsCompleted = dto.IsCompleted;
-            todo.Deadline = dto.Deadline;
-
-            await _context.SaveChangesAsync();
 
             return Ok(todo);
         }
@@ -78,16 +57,9 @@ namespace ToDoList.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTodo(int id)
         {
-            var todo = await _context.Todos.FindAsync(id);
-
-            if (todo == null)
-            {
+            var delete = await _todoService.DeleteAsync(id);
+            if (!delete)
                 return NotFound();
-            }
-
-            _context.Todos.Remove(todo);
-
-            await _context.SaveChangesAsync();
 
             return NoContent();
         }

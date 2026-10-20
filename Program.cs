@@ -1,7 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using ToDoList.Api.Data;
+using ToDoList.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddScoped<TodoService>();
 
 builder.Services.AddDbContext<TodoDbContext>(options =>
     options.UseNpgsql(
