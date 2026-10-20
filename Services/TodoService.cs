@@ -5,7 +5,7 @@ using ToDoList.Api.DTOs;
 
 namespace ToDoList.Api.Services
 {
-    public class TodoService
+    public class TodoService : ITodoService
     {
         private readonly TodoDbContext _context;
         public TodoService(TodoDbContext context)

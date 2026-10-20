@@ -4,7 +4,7 @@ using ToDoList.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddScoped<TodoService>();
+builder.Services.AddScoped<ITodoService, TodoService>();
 
 builder.Services.AddDbContext<TodoDbContext>(options =>
     options.UseNpgsql(
