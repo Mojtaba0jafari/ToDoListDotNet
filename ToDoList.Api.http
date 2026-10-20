@@ -8,9 +8,9 @@ POST {{ToDoList.Api_HostAddress}}/api/Todo
 Content-Type: application/json
 
 {
-  "title": "Learn Dependency Injection",
-  "description": "Understand DI in ASP.NET Core",
-  "deadline": "2026-10-02T00:00:00Z"
+  "title": "Learn HTTP status codes",
+  "description": "Practice CreatedAtAction",
+  "deadline": "2026-11-01T00:00:00Z"
 }
 
 ###
@@ -28,3 +28,31 @@ Content-Type: application/json
 ###
 
 DELETE {{ToDoList.Api_HostAddress}}/api/Todo/3
+
+
+###
+
+POST {{ToDoList.Api_HostAddress}}/api/Todo
+Content-Type: application/json
+
+{
+  "title": "   ",
+  "description": "This should not be created"
+}
+
+###
+
+PUT {{ToDoList.Api_HostAddress}}/api/Todo/10
+Content-Type: application/json
+
+{
+  "title": "",
+  "description": "Practice CRUD operations",
+  "isCompleted": true,
+  "deadline": "2026-10-25T00:00:00Z"
+}
+
+###
+
+GET {{ToDoList.Api_HostAddress}}/api/Todo/10
+

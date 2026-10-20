@@ -24,6 +24,19 @@ namespace ToDoList.Api.Controllers
             
             return Ok(todo);
         }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetTodoById(int id)
+        {
+            var todo = await _context.Todos.FindAsync(id);
+
+            if (todo == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(todo);
+        }
         
         [HttpPost]
         public async Task<IActionResult> CreateTodo(CreateTodoDto dto) 
@@ -39,7 +52,7 @@ namespace ToDoList.Api.Controllers
             _context.Todos.Add(todo);
             await _context.SaveChangesAsync();
 
-            return Ok(todo);
+            return CreatedAtAction(nameof(GetTodoById), new {id = todo.Id}, todo);
         }
 
         [HttpPut("{id}")]
