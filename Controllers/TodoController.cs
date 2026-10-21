@@ -63,5 +63,15 @@ namespace ToDoList.Api.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("incomplete")]
+        public async Task<IActionResult> GetInComplete()
+        {
+            var todo = await _todoService.GetIncompleteTodoAsync();
+            if (todo == null) 
+                return NotFound();
+
+            return Ok(todo);
+        }
     }
 }

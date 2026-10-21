@@ -8,9 +8,9 @@ POST {{ToDoList.Api_HostAddress}}/api/Todo
 Content-Type: application/json
 
 {
-  "title": "Learn ASP.NET Core",
-  "description": "Practice CRUD operations",
-  "deadline": "2026-10-25T00:00:00Z"
+  "title": "Learn LINQ",
+  "description": "Practice filtering",
+  "deadline": "2026-11-01T00:00:00Z"
 }
 
 ###
@@ -36,7 +36,7 @@ POST {{ToDoList.Api_HostAddress}}/api/Todo
 Content-Type: application/json
 
 {
-  "title": "   ",
+  "title": "",
   "description": "This should not be created"
 }
 
@@ -56,3 +56,9 @@ Content-Type: application/json
 
 GET {{ToDoList.Api_HostAddress}}/api/Todo/1
 
+###
+
+
+GET {{ToDoList.Api_HostAddress}}/api/Todo/incomplete
+
+###

@@ -64,5 +64,14 @@ namespace ToDoList.Api.Services
 
             return true;
         }
+
+        public async Task<List<Todo>> GetIncompleteTodoAsync()
+        {
+            return await _context.Todos
+                .Where(todo => !todo.IsCompleted)
+                .OrderByDescending(todo => todo.CreatedAt)
+                .Take(10)
+                .ToListAsync();
+        }
     }
 }
