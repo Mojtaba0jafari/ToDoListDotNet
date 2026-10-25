@@ -73,5 +73,15 @@ namespace ToDoList.Api.Controllers
 
             return Ok(todo);
         }
+
+        [HttpPatch("{id:int}")]
+        public async Task<IActionResult> Patch(int id, PatchTodoDto dto)
+        {
+            var result = await _todoService.PatchAsync(id, dto);
+            if (!result)
+                return NotFound();
+
+            return NoContent();
+        }
     }
 }

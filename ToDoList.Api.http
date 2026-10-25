@@ -62,3 +62,11 @@ GET {{ToDoList.Api_HostAddress}}/api/Todo/1
 GET {{ToDoList.Api_HostAddress}}/api/Todo/incomplete
 
 ###
+
+PATCH {{ToDoList.Api_HostAddress}}/api/Todo/7
+Content-Type: application/json
+
+{
+  "description": "Practice DI in action"
+}
+###

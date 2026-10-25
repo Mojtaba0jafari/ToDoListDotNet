@@ -73,5 +73,24 @@ namespace ToDoList.Api.Services
                 .Take(10)
                 .ToListAsync();
         }
+
+        public async Task<bool> PatchAsync(int id, PatchTodoDto dto)
+        {
+            var todo = await _context.Todos.FindAsync(id);
+            if (todo == null) 
+                return false;
+
+            if (dto.Title != null)
+                todo.Title = dto.Title;
+            if (dto.DescriptionSpecified)
+                todo.Description = dto.Description;
+            if (dto.IsCompleted.HasValue)
+                todo.IsCompleted = dto.IsCompleted.Value;
+            if (dto.Deadline.HasValue)
+                todo.Deadline = dto.Deadline.Value;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

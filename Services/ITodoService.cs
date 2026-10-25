@@ -11,5 +11,6 @@ namespace ToDoList.Api.Services
         Task<Todo?> UpdatedAsync(int id, UpdateTodoDto dto);
         Task<bool> DeleteAsync(int id);
         Task<List<Todo>> GetIncompleteTodoAsync();
+        Task<bool> PatchAsync(int id, PatchTodoDto dto);
     }
 }
