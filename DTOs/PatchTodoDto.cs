@@ -5,6 +5,8 @@ namespace ToDoList.Api.DTOs
 {
     public class PatchTodoDto
     {
+        [RegularExpression(@"[\s\S]*\S[\s\S]*",
+            ErrorMessage = "Title cannot be empty or whitespace.")]
         [StringLength(100, ErrorMessage = "Title cannot exceed 100 characters.")]
         public string? Title { get; set; }
         private string? _description;

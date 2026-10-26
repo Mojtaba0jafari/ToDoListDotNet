@@ -8,7 +8,7 @@ builder.Services.AddScoped<ITodoService, TodoService>();
 
 builder.Services.AddDbContext<TodoDbContext>(options =>
     options.UseNpgsql(
-        "Host=localhost;Port=5432;Database=todo_db;Username=postgres;Password=SuperUser!"));
+        builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
