@@ -13,17 +13,25 @@ namespace ToDoList.Api.Services
             _context = context;
         }
 
-        public async Task<List<Todo>> GetAllAsync()
+        public async Task<List<Todo>> GetAllAsync(
+            CancellationToken cancellationToken)
         {
-            return await _context.Todos.ToListAsync();
+            return await _context.Todos
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<Todo?> GetByIdAsync(int id)
+        public async Task<Todo?> GetByIdAsync(
+            int id, 
+            CancellationToken cancellationToken)
         {
-            return await _context.Todos.FindAsync(id);
+            return await _context.Todos.FindAsync(
+                new object[] { id },
+                cancellationToken);
         }
 
-        public async Task<Todo> CreateAsync(CreateTodoDto dto)
+        public async Task<Todo> CreateAsync(
+            CreateTodoDto dto, 
+            CancellationToken cancellationToken)
         {
             var todo = new Todo
             {
@@ -34,13 +42,18 @@ namespace ToDoList.Api.Services
                 Deadline = dto.Deadline
             };
             _context.Todos.Add(todo);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return todo;
         }
 
-        public async Task<Todo?> UpdatedAsync(int id, UpdateTodoDto dto)
+        public async Task<Todo?> UpdatedAsync(
+            int id, 
+            UpdateTodoDto dto, 
+            CancellationToken cancellationToken)
         {
-            var todo = await _context.Todos.FindAsync(id);
+            var todo = await _context.Todos.FindAsync(
+                new object[] { id },
+                cancellationToken);
             if (todo == null)
                 return null;
 
@@ -48,35 +61,45 @@ namespace ToDoList.Api.Services
             todo.Description = dto.Description;
             todo.IsCompleted = dto.IsCompleted;
             todo.Deadline = dto.Deadline;
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return todo;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(
+            int id, 
+            CancellationToken cancellationToken)
         {
-            var todo = await _context.Todos.FindAsync(id);
+            var todo = await _context.Todos.FindAsync(
+                new object[] { id },
+                cancellationToken);
             if (todo == null)
                 return false;
 
             _context.Todos.Remove(todo);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return true;
         }
 
-        public async Task<List<Todo>> GetIncompleteTodoAsync()
+        public async Task<List<Todo>> GetIncompleteTodoAsync(
+            CancellationToken cancellationToken)
         {
             return await _context.Todos
                 .Where(todo => !todo.IsCompleted)
                 .OrderByDescending(todo => todo.CreatedAt)
                 .Take(10)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
-        public async Task<bool> PatchAsync(int id, PatchTodoDto dto)
+        public async Task<bool> PatchAsync(
+            int id, 
+            PatchTodoDto dto, 
+            CancellationToken cancellationToken)
         {
-            var todo = await _context.Todos.FindAsync(id);
+            var todo = await _context.Todos.FindAsync(
+                new object[] { id }, 
+                cancellationToken);
             if (todo == null) 
                 return false;
 
@@ -89,7 +112,7 @@ namespace ToDoList.Api.Services
             if (dto.Deadline.HasValue)
                 todo.Deadline = dto.Deadline.Value;
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return true;
         }
     }

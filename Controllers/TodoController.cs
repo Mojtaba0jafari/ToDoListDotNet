@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ToDoList.Api.Services;
+using System.Threading;
 using ToDoList.Api.DTOs;
+using ToDoList.Api.Services;
 
 namespace ToDoList.Api.Controllers
 {
@@ -16,17 +17,22 @@ namespace ToDoList.Api.Controllers
         }
         
         [HttpGet]
-        public async Task<IActionResult> GetTodos()
+        public async Task<IActionResult> GetTodos(
+            CancellationToken cancellationToken)
         {
-            var todo = await _todoService.GetAllAsync();
+            var todo = await _todoService.GetAllAsync(cancellationToken);
             
             return Ok(todo);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetTodoById(int id)
+        public async Task<IActionResult> GetTodoById(
+            int id,
+            CancellationToken cancellationToken)
         {
-            var todo = await _todoService.GetByIdAsync(id);
+            var todo = await _todoService.GetByIdAsync(
+                id, 
+                cancellationToken);
             if (todo == null)
                 return NotFound();
 
@@ -34,9 +40,13 @@ namespace ToDoList.Api.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> CreateTodo(CreateTodoDto dto) 
+        public async Task<IActionResult> CreateTodo(
+            CreateTodoDto dto,
+            CancellationToken cancellationToken) 
         {
-            var todo = await _todoService.CreateAsync(dto);
+            var todo = await _todoService.CreateAsync(
+                dto,
+                cancellationToken);
 
             return CreatedAtAction(
                 nameof(GetTodoById), 
@@ -45,9 +55,15 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTodo(int id, UpdateTodoDto dto)
+        public async Task<IActionResult> UpdateTodo(
+            int id, 
+            UpdateTodoDto dto,
+            CancellationToken cancellationToken)
         {
-            var todo = await _todoService.UpdatedAsync(id, dto);
+            var todo = await _todoService.UpdatedAsync(
+                id, 
+                dto,
+                cancellationToken);
             if (todo == null)
                 return NotFound();
 
@@ -55,9 +71,13 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTodo(int id)
+        public async Task<IActionResult> DeleteTodo(
+            int id,
+            CancellationToken cancellationToken)
         {
-            var delete = await _todoService.DeleteAsync(id);
+            var delete = await _todoService.DeleteAsync(
+                id,
+                cancellationToken);
             if (!delete)
                 return NotFound();
 
@@ -65,9 +85,11 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpGet("incomplete")]
-        public async Task<IActionResult> GetInComplete()
+        public async Task<IActionResult> GetInComplete(
+            CancellationToken cancellationToken)
         {
-            var todo = await _todoService.GetIncompleteTodoAsync();
+            var todo = await _todoService.GetIncompleteTodoAsync(
+                cancellationToken);
             if (todo == null) 
                 return NotFound();
 
@@ -75,9 +97,15 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpPatch("{id:int}")]
-        public async Task<IActionResult> Patch(int id, PatchTodoDto dto)
+        public async Task<IActionResult> Patch(
+            int id, 
+            PatchTodoDto dto,
+            CancellationToken cancellationToken)
         {
-            var result = await _todoService.PatchAsync(id, dto);
+            var result = await _todoService.PatchAsync(
+                id, 
+                dto,
+                cancellationToken);
             if (!result)
                 return NotFound();
 
