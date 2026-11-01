@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ToDoList.Api;
 using ToDoList.Api.Data;
 using ToDoList.Api.Services;
 
@@ -12,6 +13,7 @@ builder.Services.AddDbContext<TodoDbContext>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -32,3 +34,7 @@ app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program
+{
+}
