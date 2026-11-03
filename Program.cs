@@ -26,6 +26,12 @@ app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint(
+            "/openapi/v1.json",
+            "ToDoList.Api v1");
+    });
 }
 
 app.UseHttpsRedirection();

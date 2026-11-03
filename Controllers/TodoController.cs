@@ -7,6 +7,8 @@ namespace ToDoList.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [ProducesResponseType(
+        StatusCodes.Status500InternalServerError)]
     public class TodoController : ControllerBase
     {
         private readonly ITodoService _todoService;
@@ -17,6 +19,7 @@ namespace ToDoList.Api.Controllers
         }
         
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetTodos(
             CancellationToken cancellationToken)
         {
@@ -26,6 +29,8 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetTodoById(
             int id,
             CancellationToken cancellationToken)
@@ -40,6 +45,8 @@ namespace ToDoList.Api.Controllers
         }
         
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateTodo(
             CreateTodoDto dto,
             CancellationToken cancellationToken) 
@@ -55,6 +62,9 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateTodo(
             int id, 
             UpdateTodoDto dto,
@@ -71,6 +81,8 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteTodo(
             int id,
             CancellationToken cancellationToken)
@@ -85,6 +97,8 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpGet("incomplete")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetInComplete(
             CancellationToken cancellationToken)
         {
@@ -97,6 +111,9 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpPatch("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Patch(
             int id, 
             PatchTodoDto dto,
