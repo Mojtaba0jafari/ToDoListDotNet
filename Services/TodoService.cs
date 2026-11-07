@@ -16,22 +16,26 @@ namespace ToDoList.Api.Services
         public async Task<PagedResultDto<Todo>> GetAllAsync(
             int page,
             int pageSize,
+            bool? isCompleted,
             CancellationToken cancellationToken)
         {
-            var totalCount = await _context.Todos
-                .CountAsync(cancellationToken);
+            var query = _context.Todos.AsNoTracking();
+
+            if (isCompleted.HasValue)
+                query = query.Where(todo => todo.IsCompleted == isCompleted.Value);
+
+            var totalCount = await query.CountAsync(cancellationToken);
             var skip = (int)Math.Min(
-                ((long)page - 1)* pageSize,
+                ((long)page - 1) * pageSize,
                 int.MaxValue);
 
-            var todos = await _context.Todos
-                .AsNoTracking()
+            var todos = await query
                 .OrderByDescending(todo => todo.CreatedAt)
                 .ThenByDescending(todo => todo.Id)
                 .Skip(skip)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
-            var totalpages = (int)Math.Ceiling(
+            var totalPages = (int)Math.Ceiling(
                 totalCount/ (double)pageSize);
 
             return new PagedResultDto<Todo>
@@ -40,9 +44,9 @@ namespace ToDoList.Api.Services
                 Page = page,
                 PageSize = pageSize,
                 TotalCount = totalCount,
-                TotalPages = totalpages,
+                TotalPages = totalPages,
                 HasPreviousPage = page > 1,
-                HasNextPage = page < totalpages
+                HasNextPage = page < totalPages
             };
         }
 
@@ -106,16 +110,6 @@ namespace ToDoList.Api.Services
             await _context.SaveChangesAsync(cancellationToken);
 
             return true;
-        }
-
-        public async Task<List<Todo>> GetIncompleteTodoAsync(
-            CancellationToken cancellationToken)
-        {
-            return await _context.Todos
-                .Where(todo => !todo.IsCompleted)
-                .OrderByDescending(todo => todo.CreatedAt)
-                .Take(10)
-                .ToListAsync(cancellationToken);
         }
 
         public async Task<bool> PatchAsync(

@@ -24,14 +24,16 @@ namespace ToDoList.Api.Controllers
         public async Task<IActionResult> GetTodos(
             [FromQuery, Range(1, int.MaxValue)] int page = 1,
             [FromQuery, Range(1, 100)] int pageSize = 10,
+            [FromQuery] bool? isCompleted = null,
             CancellationToken cancellationToken = default)
         {
-            var todo = await _todoService.GetAllAsync(
+            var todos = await _todoService.GetAllAsync(
                 page,
                 pageSize,
+                isCompleted,
                 cancellationToken);
             
-            return Ok(todo);
+            return Ok(todos);
         }
 
         [HttpGet("{id:int}")]
@@ -100,20 +102,6 @@ namespace ToDoList.Api.Controllers
                 return NotFound();
 
             return NoContent();
-        }
-
-        [HttpGet("incomplete")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetInComplete(
-            CancellationToken cancellationToken)
-        {
-            var todo = await _todoService.GetIncompleteTodoAsync(
-                cancellationToken);
-            if (todo == null) 
-                return NotFound();
-
-            return Ok(todo);
         }
 
         [HttpPatch("{id:int}")]
