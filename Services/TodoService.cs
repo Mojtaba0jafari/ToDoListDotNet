@@ -13,11 +13,37 @@ namespace ToDoList.Api.Services
             _context = context;
         }
 
-        public async Task<List<Todo>> GetAllAsync(
+        public async Task<PagedResultDto<Todo>> GetAllAsync(
+            int page,
+            int pageSize,
             CancellationToken cancellationToken)
         {
-            return await _context.Todos
+            var totalCount = await _context.Todos
+                .CountAsync(cancellationToken);
+            var skip = (int)Math.Min(
+                ((long)page - 1)* pageSize,
+                int.MaxValue);
+
+            var todos = await _context.Todos
+                .AsNoTracking()
+                .OrderByDescending(todo => todo.CreatedAt)
+                .ThenByDescending(todo => todo.Id)
+                .Skip(skip)
+                .Take(pageSize)
                 .ToListAsync(cancellationToken);
+            var totalpages = (int)Math.Ceiling(
+                totalCount/ (double)pageSize);
+
+            return new PagedResultDto<Todo>
+            {
+                Items = todos,
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = totalpages,
+                HasPreviousPage = page > 1,
+                HasNextPage = page < totalpages
+            };
         }
 
         public async Task<Todo?> GetByIdAsync(

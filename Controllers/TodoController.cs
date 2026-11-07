@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading;
+using System.ComponentModel.DataAnnotations;
 using ToDoList.Api.DTOs;
 using ToDoList.Api.Services;
 
@@ -20,10 +20,16 @@ namespace ToDoList.Api.Controllers
         
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> GetTodos(
-            CancellationToken cancellationToken)
+            [FromQuery, Range(1, int.MaxValue)] int page = 1,
+            [FromQuery, Range(1, 100)] int pageSize = 10,
+            CancellationToken cancellationToken = default)
         {
-            var todo = await _todoService.GetAllAsync(cancellationToken);
+            var todo = await _todoService.GetAllAsync(
+                page,
+                pageSize,
+                cancellationToken);
             
             return Ok(todo);
         }

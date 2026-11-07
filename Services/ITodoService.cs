@@ -5,7 +5,10 @@ namespace ToDoList.Api.Services
 {
     public interface ITodoService
     {
-        Task<List<Todo>> GetAllAsync(CancellationToken cancellationToken);
+        Task<PagedResultDto<Todo>> GetAllAsync(
+        int page,
+        int pageSize,
+        CancellationToken cancellationToken);
         Task<Todo?> GetByIdAsync(int id, CancellationToken cancellationToken);
         Task<Todo> CreateAsync(CreateTodoDto dto, CancellationToken cancellationToken);
         Task<Todo?> UpdatedAsync(int id, UpdateTodoDto dto, CancellationToken cancellationToken);
