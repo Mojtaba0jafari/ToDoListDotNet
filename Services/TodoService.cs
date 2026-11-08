@@ -17,6 +17,8 @@ namespace ToDoList.Api.Services
             int page,
             int pageSize,
             bool? isCompleted,
+            string sortBy,
+            string sortOrder,
             CancellationToken cancellationToken)
         {
             var query = _context.Todos.AsNoTracking();
@@ -25,12 +27,27 @@ namespace ToDoList.Api.Services
                 query = query.Where(todo => todo.IsCompleted == isCompleted.Value);
 
             var totalCount = await query.CountAsync(cancellationToken);
+
+            var orderedQuery = 
+                (sortBy.ToLower(), sortOrder.ToLower()) switch
+            {
+                ("title", "asc") => query.OrderBy(todo => todo.Title),
+                ("title", "desc") => query.OrderByDescending(todo => todo.Title),
+
+                ("createdat", "asc") => query.OrderBy(todo => todo.CreatedAt),
+                ("createdat", "desc") => query.OrderByDescending(todo => todo.CreatedAt),
+
+                ("deadline", "asc") => query.OrderBy(todo => todo.Deadline),
+                ("deadline", "desc") => query.OrderByDescending(todo => todo.Deadline),
+
+                _ => query.OrderByDescending(todo => todo.CreatedAt)
+            };
+
             var skip = (int)Math.Min(
                 ((long)page - 1) * pageSize,
                 int.MaxValue);
 
-            var todos = await query
-                .OrderByDescending(todo => todo.CreatedAt)
+            var todos = await orderedQuery
                 .ThenByDescending(todo => todo.Id)
                 .Skip(skip)
                 .Take(pageSize)

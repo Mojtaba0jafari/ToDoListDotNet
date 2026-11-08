@@ -9,6 +9,8 @@ namespace ToDoList.Api.Services
         int page,
         int pageSize,
         bool? isCompleted,
+        string sortBy,
+        string sortOrder,
         CancellationToken cancellationToken);
         Task<Todo?> GetByIdAsync(int id, CancellationToken cancellationToken);
         Task<Todo> CreateAsync(CreateTodoDto dto, CancellationToken cancellationToken);

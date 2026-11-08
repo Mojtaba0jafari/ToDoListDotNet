@@ -25,12 +25,20 @@ namespace ToDoList.Api.Controllers
             [FromQuery, Range(1, int.MaxValue)] int page = 1,
             [FromQuery, Range(1, 100)] int pageSize = 10,
             [FromQuery] bool? isCompleted = null,
+            [FromQuery, RegularExpression(
+            "(?i)^(title|createdat|deadline)$")]
+            string sortBy = "createdAt",
+            [FromQuery, RegularExpression(
+            "(?i)^(asc|desc)$")]
+            string sortOrder = "desc",
             CancellationToken cancellationToken = default)
         {
             var todos = await _todoService.GetAllAsync(
                 page,
                 pageSize,
                 isCompleted,
+                sortBy,
+                sortOrder,
                 cancellationToken);
             
             return Ok(todos);
