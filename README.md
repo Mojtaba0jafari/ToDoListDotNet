@@ -2,7 +2,7 @@
 
 A small, production-shaped REST API for managing a to-do list, built with **ASP.NET Core (.NET 10)**, **Entity Framework Core** and **PostgreSQL**.
 
-The project is meant to demonstrate backend fundamentals rather than features: a clean controller → service → data layering, DTOs kept separate from the persistence model, consistent HTTP semantics, RFC 9457 error responses, and a documented OpenAPI contract.
+The project demonstrates practical backend development fundamentals, including clean layering, DTO-based API contracts, consistent HTTP semantics, RFC 9457 error responses, and a documented OpenAPI contract.
 
 ---
 
