@@ -8,12 +8,14 @@ namespace ToDoList.Api.Services
     public class TodoService : ITodoService
     {
         private readonly TodoDbContext _context;
-        public TodoService(TodoDbContext context)
+        private readonly TimeProvider _timeProvider;
+        public TodoService(TodoDbContext context, TimeProvider timeProvider)
         {
             _context = context;
+            _timeProvider = timeProvider;
         }
 
-        public async Task<PagedResultDto<Todo>> GetAllAsync(
+        public async Task<PagedResultDto<TodoResponseDto>> GetAllAsync(
             int page,
             int pageSize,
             bool? isCompleted,
@@ -29,7 +31,7 @@ namespace ToDoList.Api.Services
             var totalCount = await query.CountAsync(cancellationToken);
 
             var orderedQuery = 
-                (sortBy.ToLower(), sortOrder.ToLower()) switch
+                (sortBy.ToLowerInvariant(), sortOrder.ToLowerInvariant()) switch
             {
                 ("title", "asc") => query.OrderBy(todo => todo.Title),
                 ("title", "desc") => query.OrderByDescending(todo => todo.Title),
@@ -54,10 +56,11 @@ namespace ToDoList.Api.Services
                 .ToListAsync(cancellationToken);
             var totalPages = (int)Math.Ceiling(
                 totalCount/ (double)pageSize);
+            var now = UtcNow();
 
-            return new PagedResultDto<Todo>
+            return new PagedResultDto<TodoResponseDto>
             {
-                Items = todos,
+                Items = todos.Select(todo => todo.ToResponse(now)).ToList(),
                 Page = page,
                 PageSize = pageSize,
                 TotalCount = totalCount,
@@ -67,33 +70,36 @@ namespace ToDoList.Api.Services
             };
         }
 
-        public async Task<Todo?> GetByIdAsync(
+        public async Task<TodoResponseDto?> GetByIdAsync(
             int id, 
             CancellationToken cancellationToken)
         {
-            return await _context.Todos.FindAsync(
+            var todo = await _context.Todos.FindAsync(
                 new object[] { id },
                 cancellationToken);
+
+            return todo?.ToResponse(UtcNow());
         }
 
-        public async Task<Todo> CreateAsync(
+        public async Task<TodoResponseDto> CreateAsync(
             CreateTodoDto dto, 
             CancellationToken cancellationToken)
         {
+            var now = UtcNow();
             var todo = new Todo
             {
                 Title = dto.Title,
                 Description = dto.Description,
                 IsCompleted = false,
-                CreatedAt = DateTime.UtcNow,
-                Deadline = dto.Deadline
+                CreatedAt = now,
+                Deadline = ToUtc(dto.Deadline)
             };
             _context.Todos.Add(todo);
             await _context.SaveChangesAsync(cancellationToken);
-            return todo;
+            return todo.ToResponse(now);
         }
 
-        public async Task<Todo?> UpdatedAsync(
+        public async Task<TodoResponseDto?> UpdateAsync(
             int id, 
             UpdateTodoDto dto, 
             CancellationToken cancellationToken)
@@ -106,11 +112,11 @@ namespace ToDoList.Api.Services
 
             todo.Title = dto.Title;
             todo.Description = dto.Description;
-            todo.IsCompleted = dto.IsCompleted;
-            todo.Deadline = dto.Deadline;
+            todo.IsCompleted = dto.IsCompleted!.Value;
+            todo.Deadline = ToUtc(dto.Deadline);
             await _context.SaveChangesAsync(cancellationToken);
 
-            return todo;
+            return todo.ToResponse(UtcNow());
         }
 
         public async Task<bool> DeleteAsync(
@@ -129,7 +135,7 @@ namespace ToDoList.Api.Services
             return true;
         }
 
-        public async Task<bool> PatchAsync(
+        public async Task<TodoResponseDto?> PatchAsync(
             int id, 
             PatchTodoDto dto, 
             CancellationToken cancellationToken)
@@ -138,7 +144,7 @@ namespace ToDoList.Api.Services
                 new object[] { id }, 
                 cancellationToken);
             if (todo == null) 
-                return false;
+                return null;
 
             if (dto.Title != null)
                 todo.Title = dto.Title;
@@ -146,11 +152,21 @@ namespace ToDoList.Api.Services
                 todo.Description = dto.Description;
             if (dto.IsCompleted.HasValue)
                 todo.IsCompleted = dto.IsCompleted.Value;
-            if (dto.Deadline.HasValue)
-                todo.Deadline = dto.Deadline.Value;
+            if (dto.DeadlineSpecified)
+                todo.Deadline = ToUtc(dto.Deadline);
 
             await _context.SaveChangesAsync(cancellationToken);
-            return true;
+            return todo.ToResponse(UtcNow());
         }
+
+        private DateTime UtcNow() => _timeProvider.GetUtcNow().UtcDateTime;
+
+        private static DateTime? ToUtc(DateTime? value) => value switch
+        {
+            null => null,
+            { Kind: DateTimeKind.Utc } => value,
+            { Kind: DateTimeKind.Local } => value.Value.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(value.Value, DateTimeKind.Utc)
+        };
     }
 }

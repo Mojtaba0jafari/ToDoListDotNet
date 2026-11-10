@@ -1,10 +1,30 @@
 @ToDoList.Api_HostAddress = http://localhost:5112
+@todoId = 1
 
-GET {{ToDoList.Api_HostAddress}}/api/Todo
+### List todos (defaults: page 1, 10 per page, sorted by createdAt descending)
+GET {{ToDoList.Api_HostAddress}}/api/Todos
+Accept: application/json
+
+### List todos with paging, filtering and sorting
+GET {{ToDoList.Api_HostAddress}}/api/Todos?page=1&pageSize=5&isCompleted=false&sortBy=title&sortOrder=asc
+Accept: application/json
+
+### Invalid paging (returns 400 problem+json)
+GET {{ToDoList.Api_HostAddress}}/api/Todos?page=0&pageSize=500
 
 ###
 
-POST {{ToDoList.Api_HostAddress}}/api/Todo
+### Get one todo
+GET {{ToDoList.Api_HostAddress}}/api/Todos/{{todoId}}
+Accept: application/json
+
+### Get a todo that does not exist (returns 404 problem+json)
+GET {{ToDoList.Api_HostAddress}}/api/Todos/999999
+
+###
+
+### Create a todo (returns 201 with a Location header)
+POST {{ToDoList.Api_HostAddress}}/api/Todos
 Content-Type: application/json
 
 {
@@ -13,26 +33,8 @@ Content-Type: application/json
   "deadline": "2026-11-01T00:00:00Z"
 }
 
-###
-
-PUT {{ToDoList.Api_HostAddress}}/api/Todo/8
-Content-Type: application/json
-
-{
-  "title": "Learn ASP.NET Core",
-  "description": "Practice CRUD operations",
-  "isCompleted": true,
-  "deadline": "2026-10-25T00:00:00Z"
-}
-
-###
-
-DELETE {{ToDoList.Api_HostAddress}}/api/Todo/1
-
-
-###
-
-POST {{ToDoList.Api_HostAddress}}/api/Todo
+### Create a todo without a title (returns 400 problem+json)
+POST {{ToDoList.Api_HostAddress}}/api/Todos
 Content-Type: application/json
 
 {
@@ -42,31 +44,61 @@ Content-Type: application/json
 
 ###
 
-PUT {{ToDoList.Api_HostAddress}}/api/Todo/10
+### Replace a todo (PUT is a full replacement; only description and deadline may be omitted)
+PUT {{ToDoList.Api_HostAddress}}/api/Todos/{{todoId}}
 Content-Type: application/json
 
 {
-  "title": "",
+  "title": "Learn ASP.NET Core",
   "description": "Practice CRUD operations",
   "isCompleted": true,
   "deadline": "2026-10-25T00:00:00Z"
 }
 
-###
-
-GET {{ToDoList.Api_HostAddress}}/api/Todo/1
-
-###
-
-
-GET {{ToDoList.Api_HostAddress}}/api/Todo/incomplete
-
-###
-
-PATCH {{ToDoList.Api_HostAddress}}/api/Todo/7
+### Replace without isCompleted (returns 400: the field is required)
+PUT {{ToDoList.Api_HostAddress}}/api/Todos/{{todoId}}
 Content-Type: application/json
 
 {
-  "description": "Practice DI in action"
+  "title": "Learn ASP.NET Core",
+  "description": "Practice CRUD operations"
 }
+
 ###
+
+### Partial update: change only the title
+PATCH {{ToDoList.Api_HostAddress}}/api/Todos/{{todoId}}
+Content-Type: application/json
+
+{
+  "title": "Learn LINQ deeply"
+}
+
+### Partial update: clear the description
+PATCH {{ToDoList.Api_HostAddress}}/api/Todos/{{todoId}}
+Content-Type: application/json
+
+{
+  "description": null
+}
+
+### Partial update: clear the deadline
+PATCH {{ToDoList.Api_HostAddress}}/api/Todos/{{todoId}}
+Content-Type: application/json
+
+{
+  "deadline": null
+}
+
+### Partial update with an unknown field (returns 400: unknown members are rejected)
+PATCH {{ToDoList.Api_HostAddress}}/api/Todos/{{todoId}}
+Content-Type: application/json
+
+{
+  "titel": "typo"
+}
+
+###
+
+### Delete a todo (returns 204, or 404 when it is already gone)
+DELETE {{ToDoList.Api_HostAddress}}/api/Todos/{{todoId}}

@@ -7,21 +7,26 @@ namespace ToDoList.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [ProducesResponseType(
-        StatusCodes.Status500InternalServerError)]
-    public class TodoController : ControllerBase
+    [ProducesResponseType<ProblemDetails>(
+        StatusCodes.Status500InternalServerError,
+        "application/problem+json")]
+    public class TodosController : ControllerBase
     {
         private readonly ITodoService _todoService;
 
-        public TodoController(ITodoService todoService)
+        public TodosController(ITodoService todoService)
         {
             _todoService = todoService;
         }
         
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetTodos(
+        [ProducesResponseType<PagedResultDto<TodoResponseDto>>(
+            StatusCodes.Status200OK,
+            "application/json")]
+        [ProducesResponseType<ValidationProblemDetails>(
+            StatusCodes.Status400BadRequest,
+            "application/problem+json")]
+        public async Task<ActionResult<PagedResultDto<TodoResponseDto>>> GetTodos(
             [FromQuery, Range(1, int.MaxValue)] int page = 1,
             [FromQuery, Range(1, 100)] int pageSize = 10,
             [FromQuery] bool? isCompleted = null,
@@ -45,9 +50,13 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetTodoById(
+        [ProducesResponseType<TodoResponseDto>(
+            StatusCodes.Status200OK,
+            "application/json")]
+        [ProducesResponseType<ProblemDetails>(
+            StatusCodes.Status404NotFound,
+            "application/problem+json")]
+        public async Task<ActionResult<TodoResponseDto>> GetTodoById(
             int id,
             CancellationToken cancellationToken)
         {
@@ -61,9 +70,13 @@ namespace ToDoList.Api.Controllers
         }
         
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateTodo(
+        [ProducesResponseType<TodoResponseDto>(
+            StatusCodes.Status201Created,
+            "application/json")]
+        [ProducesResponseType<ValidationProblemDetails>(
+            StatusCodes.Status400BadRequest,
+            "application/problem+json")]
+        public async Task<ActionResult<TodoResponseDto>> CreateTodo(
             CreateTodoDto dto,
             CancellationToken cancellationToken) 
         {
@@ -78,15 +91,21 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpPut("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateTodo(
+        [ProducesResponseType<TodoResponseDto>(
+            StatusCodes.Status200OK,
+            "application/json")]
+        [ProducesResponseType<ValidationProblemDetails>(
+            StatusCodes.Status400BadRequest,
+            "application/problem+json")]
+        [ProducesResponseType<ProblemDetails>(
+            StatusCodes.Status404NotFound,
+            "application/problem+json")]
+        public async Task<ActionResult<TodoResponseDto>> UpdateTodo(
             int id, 
             UpdateTodoDto dto,
             CancellationToken cancellationToken)
         {
-            var todo = await _todoService.UpdatedAsync(
+            var todo = await _todoService.UpdateAsync(
                 id, 
                 dto,
                 cancellationToken);
@@ -98,7 +117,9 @@ namespace ToDoList.Api.Controllers
 
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType<ProblemDetails>(
+            StatusCodes.Status404NotFound,
+            "application/problem+json")]
         public async Task<IActionResult> DeleteTodo(
             int id,
             CancellationToken cancellationToken)
@@ -113,22 +134,28 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpPatch("{id:int}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Patch(
+        [ProducesResponseType<TodoResponseDto>(
+            StatusCodes.Status200OK,
+            "application/json")]
+        [ProducesResponseType<ValidationProblemDetails>(
+            StatusCodes.Status400BadRequest,
+            "application/problem+json")]
+        [ProducesResponseType<ProblemDetails>(
+            StatusCodes.Status404NotFound,
+            "application/problem+json")]
+        public async Task<ActionResult<TodoResponseDto>> PatchTodo(
             int id, 
             PatchTodoDto dto,
             CancellationToken cancellationToken)
         {
-            var result = await _todoService.PatchAsync(
+            var todo = await _todoService.PatchAsync(
                 id, 
                 dto,
                 cancellationToken);
-            if (!result)
+            if (todo == null)
                 return NotFound();
 
-            return NoContent();
+            return Ok(todo);
         }
     }
 }

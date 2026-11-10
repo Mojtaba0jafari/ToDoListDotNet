@@ -1,21 +1,24 @@
-﻿using ToDoList.Api.Domain;
-using ToDoList.Api.DTOs;
+﻿using ToDoList.Api.DTOs;
 
 namespace ToDoList.Api.Services
 {
     public interface ITodoService
     {
-        Task<PagedResultDto<Todo>> GetAllAsync(
+        Task<PagedResultDto<TodoResponseDto>> GetAllAsync(
         int page,
         int pageSize,
         bool? isCompleted,
         string sortBy,
         string sortOrder,
         CancellationToken cancellationToken);
-        Task<Todo?> GetByIdAsync(int id, CancellationToken cancellationToken);
-        Task<Todo> CreateAsync(CreateTodoDto dto, CancellationToken cancellationToken);
-        Task<Todo?> UpdatedAsync(int id, UpdateTodoDto dto, CancellationToken cancellationToken);
+        Task<TodoResponseDto?> GetByIdAsync(
+            int id, CancellationToken cancellationToken);
+        Task<TodoResponseDto> CreateAsync(
+            CreateTodoDto dto, CancellationToken cancellationToken);
+        Task<TodoResponseDto?> UpdateAsync(
+            int id, UpdateTodoDto dto, CancellationToken cancellationToken);
         Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
-        Task<bool> PatchAsync(int id, PatchTodoDto dto, CancellationToken cancellationToken);
+        Task<TodoResponseDto?> PatchAsync(
+            int id, PatchTodoDto dto, CancellationToken cancellationToken);
     }
 }
