@@ -271,39 +271,4 @@ dotnet ef migrations has-pending-model-changes
 
 ## Tests
 
-The suite lives in the sibling project `../ToDoList.Test` (xUnit, SQLite in-memory, `WebApplicationFactory` for the HTTP pipeline) and is not part of this solution file. Run it from its own directory, not from the solution root:
-
-```bash
-cd ../ToDoList.Test
-dotnet test
-```
-
----
-
-## Roadmap
-
-Planned work for future development stages. **Nothing in this section is implemented yet** — the API described above is the current state of the project; everything below is a goal.
-
-### Authentication and multi-user support
-
-- [ ] User registration and login
-- [ ] JWT-based authentication and authorization
-- [ ] Support for multiple users
-- [ ] User-specific Todo ownership and access control, so every user can only read and manage their own Todos
-
-### Redis integration and security
-
-- [ ] Redis integration for tracking failed login attempts
-- [ ] Temporary account lockout after 5 failed login attempts, with a 30-second waiting period
-- [ ] Redis-backed JWT token blacklist / revocation, to invalidate tokens before they expire — for example after logout
-
-### Infrastructure and deployment
-
-- [ ] Docker containerization
-- [ ] Linux deployment
-- [ ] Production deployment and configuration
-
-### Testing and reliability
-
-- [ ] Automated unit and integration tests committed to this repository and run in CI — the existing suite lives in a sibling project outside it (see [Tests](#tests))
-- [ ] Concurrency control for Todo updates, using `ETag` / `If-Match` or an equivalent mechanism
+The unit and integration tests live in a separate repository: [ToDoList.Tests](https://github.com/Mojtaba0jafari/ToDoList.Tests). That repository contains the unit and integration tests for this API — xUnit, an in-memory SQLite database and `WebApplicationFactory` for the HTTP pipeline.
