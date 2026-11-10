@@ -38,8 +38,15 @@ dotnet tool install --global dotnet-ef
 
 ### 1. Restore and build
 
+Restore the NuGet packages:
+
 ```bash
 dotnet restore
+```
+
+Compile the project:
+
+```bash
 dotnet build
 ```
 
@@ -47,12 +54,29 @@ dotnet build
 
 The connection string is **not** stored in `appsettings.json`; it is read from configuration key `ConnectionStrings:DefaultConnection`. For local development use [user secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets):
 
-```bash
-dotnet user-secrets set "ConnectionStrings:DefaultConnection" \
-  "Host=localhost;Database=todolist;Username=postgres;Password=your-password"
+**Windows PowerShell**
+
+```powershell
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Database=todolist;Username=postgres;Password=your-password"
 ```
 
-An environment variable works as well:
+Keep the command on a single line. PowerShell continues a line with a backtick, not a backslash, so ending the line with a backslash breaks it.
+
+**bash / zsh**
+
+```bash
+dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Database=todolist;Username=postgres;Password=your-password"
+```
+
+An environment variable works as well.
+
+**Windows PowerShell**
+
+```powershell
+$env:ConnectionStrings__DefaultConnection = "Host=localhost;Database=todolist;Username=postgres;Password=your-password"
+```
+
+**bash / zsh**
 
 ```bash
 export ConnectionStrings__DefaultConnection="Host=localhost;Database=todolist;Username=postgres;Password=your-password"
@@ -154,12 +178,20 @@ Sorting is deterministic: every ordering is followed by `id DESC`, so records th
 
 `PATCH /api/Todos/{id}` – send only what changes. A field that is absent keeps its value; an explicit `null` clears a nullable field.
 
-```json
-{ "isCompleted": true }
-```
+Mark a to-do as completed:
 
 ```json
-{ "deadline": null }
+{
+  "isCompleted": true
+}
+```
+
+Clear its deadline:
+
+```json
+{
+  "deadline": null
+}
 ```
 
 ### Errors
@@ -211,19 +243,67 @@ Dependencies point inward: `Controllers → Services → Data/Domain`. DTOs neve
 
 ## Migrations
 
+Create a migration after changing the model:
+
 ```bash
-dotnet ef migrations add <Name>   # create
-dotnet ef database update         # apply
-dotnet ef migrations list         # show applied / pending
+dotnet ef migrations add <Name>
+```
+
+Apply all pending migrations to the database:
+
+```bash
+dotnet ef database update
+```
+
+List the migrations and their applied / pending state:
+
+```bash
+dotnet ef migrations list
+```
+
+Check whether the model has drifted away from the last migration:
+
+```bash
 dotnet ef migrations has-pending-model-changes
 ```
 
 ---
 
-## Known limitations / next steps
+## Tests
 
-- **No automated tests yet.** Behaviour has been verified manually against PostgreSQL; a test project (WebApplicationFactory + Testcontainers) is the next priority.
-- **No authentication or authorization.** Every endpoint is anonymous.
-- **No concurrency control.** Concurrent `PUT`/`PATCH` requests are last-writer-wins; an `ETag`/`If-Match` or `xmin` row version would close that gap.
-- **No API versioning.** The document is published as `v1` but the path is unversioned.
-- **CORS origins are hard-coded** in `Program.cs` for local development and should come from configuration before deployment.
+The suite lives in the sibling project `../ToDoList.Test` (xUnit, SQLite in-memory, `WebApplicationFactory` for the HTTP pipeline) and is not part of this solution file. Run it from its own directory, not from the solution root:
+
+```bash
+cd ../ToDoList.Test
+dotnet test
+```
+
+---
+
+## Roadmap
+
+Planned work for future development stages. **Nothing in this section is implemented yet** — the API described above is the current state of the project; everything below is a goal.
+
+### Authentication and multi-user support
+
+- [ ] User registration and login
+- [ ] JWT-based authentication and authorization
+- [ ] Support for multiple users
+- [ ] User-specific Todo ownership and access control, so every user can only read and manage their own Todos
+
+### Redis integration and security
+
+- [ ] Redis integration for tracking failed login attempts
+- [ ] Temporary account lockout after 5 failed login attempts, with a 30-second waiting period
+- [ ] Redis-backed JWT token blacklist / revocation, to invalidate tokens before they expire — for example after logout
+
+### Infrastructure and deployment
+
+- [ ] Docker containerization
+- [ ] Linux deployment
+- [ ] Production deployment and configuration
+
+### Testing and reliability
+
+- [ ] Automated unit and integration tests committed to this repository and run in CI — the existing suite lives in a sibling project outside it (see [Tests](#tests))
+- [ ] Concurrency control for Todo updates, using `ETag` / `If-Match` or an equivalent mechanism
