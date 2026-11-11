@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using ToDoList.Api;
 using ToDoList.Api.Data;
+using ToDoList.Api.Domain;
 using ToDoList.Api.Services;
 
 const string FrontendCorsPolicy = "Frontend";
@@ -9,6 +11,8 @@ const string FrontendCorsPolicy = "Frontend";
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<ITodoService, TodoService>();
 
 builder.Services.AddDbContext<TodoDbContext>(options =>

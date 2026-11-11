@@ -11,6 +11,7 @@ namespace ToDoList.Api.Data
         }
 
         public DbSet<Todo> Todos { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -23,6 +24,18 @@ namespace ToDoList.Api.Data
                 entity.Property(todo => todo.Description)
                     .HasMaxLength(TodoConstraints.DescriptionMaxLength);
             });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasIndex(user => user.Email)
+                    .IsUnique();
+            });
+
+            modelBuilder.Entity<User>()
+                .HasMany(user => user.Todos)
+                .WithOne(todo => todo.User)
+                .HasForeignKey(todo => todo.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
