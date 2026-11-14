@@ -16,6 +16,7 @@ namespace ToDoList.Api.Services
         }
 
         public async Task<PagedResultDto<TodoResponseDto>> GetAllAsync(
+            int userId, 
             int page,
             int pageSize,
             bool? isCompleted,
@@ -23,7 +24,9 @@ namespace ToDoList.Api.Services
             string sortOrder,
             CancellationToken cancellationToken)
         {
-            var query = _context.Todos.AsNoTracking();
+            var query = _context.Todos
+                .AsNoTracking()
+                .Where(todo => todo.UserId == userId);
 
             if (isCompleted.HasValue)
                 query = query.Where(todo => todo.IsCompleted == isCompleted.Value);
@@ -71,23 +74,27 @@ namespace ToDoList.Api.Services
         }
 
         public async Task<TodoResponseDto?> GetByIdAsync(
+            int userId, 
             int id, 
             CancellationToken cancellationToken)
         {
-            var todo = await _context.Todos.FindAsync(
-                new object[] { id },
+            var todo = await _context.Todos
+                .FirstOrDefaultAsync(
+                todo => todo.Id == id && todo.UserId == userId,
                 cancellationToken);
 
             return todo?.ToResponse(UtcNow());
         }
 
         public async Task<TodoResponseDto> CreateAsync(
+            int userId, 
             CreateTodoDto dto, 
             CancellationToken cancellationToken)
         {
             var now = UtcNow();
             var todo = new Todo
             {
+                UserId = userId,
                 Title = dto.Title,
                 Description = dto.Description,
                 IsCompleted = false,
@@ -100,12 +107,13 @@ namespace ToDoList.Api.Services
         }
 
         public async Task<TodoResponseDto?> UpdateAsync(
+            int userId, 
             int id, 
             UpdateTodoDto dto, 
             CancellationToken cancellationToken)
         {
-            var todo = await _context.Todos.FindAsync(
-                new object[] { id },
+            var todo = await _context.Todos.FirstOrDefaultAsync(
+                todo => todo.Id == id && todo.UserId == userId,
                 cancellationToken);
             if (todo == null)
                 return null;
@@ -120,11 +128,12 @@ namespace ToDoList.Api.Services
         }
 
         public async Task<bool> DeleteAsync(
+            int userId, 
             int id, 
             CancellationToken cancellationToken)
         {
-            var todo = await _context.Todos.FindAsync(
-                new object[] { id },
+            var todo = await _context.Todos.FirstOrDefaultAsync(
+                todo => todo.Id == id && todo.UserId == userId,
                 cancellationToken);
             if (todo == null)
                 return false;
@@ -136,12 +145,13 @@ namespace ToDoList.Api.Services
         }
 
         public async Task<TodoResponseDto?> PatchAsync(
+            int userId, 
             int id, 
             PatchTodoDto dto, 
             CancellationToken cancellationToken)
         {
-            var todo = await _context.Todos.FindAsync(
-                new object[] { id }, 
+            var todo = await _context.Todos.FirstOrDefaultAsync(
+                todo => todo.Id == id && todo.UserId == userId, 
                 cancellationToken);
             if (todo == null) 
                 return null;

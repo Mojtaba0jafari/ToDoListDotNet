@@ -33,5 +33,23 @@ namespace ToDoList.Api.Controllers
             }
                 return StatusCode(StatusCodes.Status201Created, result);
         }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<LoginResponseDto>> Login(
+            LoginRequestDto request,
+            CancellationToken cancellationToken)
+        {
+            var result = await _authService.LoginAsync(
+                request,
+                cancellationToken);
+            if (result == null)
+                return Unauthorized(new ProblemDetails
+                {
+                    Title = "Invalid emial or password",
+                    Status = StatusCodes.Status401Unauthorized
+                });
+
+            return Ok(result);
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using ToDoList.Api.DTOs;
 using ToDoList.Api.Services;
@@ -7,12 +9,15 @@ namespace ToDoList.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     [ProducesResponseType<ProblemDetails>(
         StatusCodes.Status500InternalServerError,
         "application/problem+json")]
     public class TodosController : ControllerBase
     {
         private readonly ITodoService _todoService;
+        private int CurrentUserId =>
+            int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         public TodosController(ITodoService todoService)
         {
@@ -39,6 +44,7 @@ namespace ToDoList.Api.Controllers
             CancellationToken cancellationToken = default)
         {
             var todos = await _todoService.GetAllAsync(
+                CurrentUserId, 
                 page,
                 pageSize,
                 isCompleted,
@@ -61,6 +67,7 @@ namespace ToDoList.Api.Controllers
             CancellationToken cancellationToken)
         {
             var todo = await _todoService.GetByIdAsync(
+                CurrentUserId, 
                 id, 
                 cancellationToken);
             if (todo == null)
@@ -81,6 +88,7 @@ namespace ToDoList.Api.Controllers
             CancellationToken cancellationToken) 
         {
             var todo = await _todoService.CreateAsync(
+                CurrentUserId, 
                 dto,
                 cancellationToken);
 
@@ -106,6 +114,7 @@ namespace ToDoList.Api.Controllers
             CancellationToken cancellationToken)
         {
             var todo = await _todoService.UpdateAsync(
+                CurrentUserId, 
                 id, 
                 dto,
                 cancellationToken);
@@ -125,6 +134,7 @@ namespace ToDoList.Api.Controllers
             CancellationToken cancellationToken)
         {
             var delete = await _todoService.DeleteAsync(
+                CurrentUserId, 
                 id,
                 cancellationToken);
             if (!delete)
@@ -149,6 +159,7 @@ namespace ToDoList.Api.Controllers
             CancellationToken cancellationToken)
         {
             var todo = await _todoService.PatchAsync(
+                CurrentUserId, 
                 id, 
                 dto,
                 cancellationToken);

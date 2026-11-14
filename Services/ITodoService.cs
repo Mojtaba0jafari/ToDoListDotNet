@@ -5,6 +5,7 @@ namespace ToDoList.Api.Services
     public interface ITodoService
     {
         Task<PagedResultDto<TodoResponseDto>> GetAllAsync(
+        int userId, 
         int page,
         int pageSize,
         bool? isCompleted,
@@ -12,13 +13,26 @@ namespace ToDoList.Api.Services
         string sortOrder,
         CancellationToken cancellationToken);
         Task<TodoResponseDto?> GetByIdAsync(
-            int id, CancellationToken cancellationToken);
+            int userId, 
+            int id, 
+            CancellationToken cancellationToken);
         Task<TodoResponseDto> CreateAsync(
-            CreateTodoDto dto, CancellationToken cancellationToken);
+            int userId, 
+            CreateTodoDto dto, 
+            CancellationToken cancellationToken);
         Task<TodoResponseDto?> UpdateAsync(
-            int id, UpdateTodoDto dto, CancellationToken cancellationToken);
-        Task<bool> DeleteAsync(int id, CancellationToken cancellationToken);
+            int userId, 
+            int id, 
+            UpdateTodoDto dto, 
+            CancellationToken cancellationToken);
+        Task<bool> DeleteAsync(
+            int userId, 
+            int id, 
+            CancellationToken cancellationToken);
         Task<TodoResponseDto?> PatchAsync(
-            int id, PatchTodoDto dto, CancellationToken cancellationToken);
+            int userId, 
+            int id, 
+            PatchTodoDto dto, 
+            CancellationToken cancellationToken);
     }
 }
